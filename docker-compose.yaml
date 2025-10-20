@@ -1,0 +1,22 @@
+services:
+  gs:
+    build:
+      context: .
+      args:
+        TORCH_CUDA_ARCH_LIST: "9.0+PTX"
+        TCNN_CUDA_ARCHS: "90"
+    image: local/gaussian-splatting:gs-py28-cu128
+    container_name: gs
+    working_dir: /workspace/gaussian-splatting
+    stdin_open: true
+    tty: true
+    ipc: host
+    gpus: all                 # ✅ 正确的 compose 写法（非 Swarm）
+    environment:
+      - DISPLAY               # ✅ 传递宿主机 DISPLAY（Wayland 下一样可用 XWayland）
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    volumes:
+      - ./:/workspace/gaussian-splatting:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro   # ✅ 挂 X11 socket
+    command: /bin/bash
